@@ -1,26 +1,50 @@
 import numpy as np
+import pandas as pd
+
 
 class Perceptron:
-    def __init__(self, inputSize, hiddenSizes, outputSize):
-        
-        self.Win = np.zeros((1+inputSize,hiddenSizes))
-        self.Win[0,:] = (np.random.randint(0, 3, size = (hiddenSizes)))
-        self.Win[1:,:] = (np.random.randint(-1, 2, size = (inputSize,hiddenSizes)))
-        
-        self.Wout = np.random.randint(0, 2, size = (1+hiddenSizes,outputSize)).astype(np.float64)
-        #self.Wout = np.random.randint(0, 3, size = (1+hiddenSizes,outputSize))
-        
+    def __init__(self, input_size, hidden_sizes, output_size):
+
+        self._w_in = np.zeros((1 + input_size, hidden_sizes))
+        self._w_in[0, :] = (np.random.randint(0, 3, size=(hidden_sizes)))
+        self._w_in[1:, :] = (np.random.randint(-1, 2, size=(input_size, hidden_sizes)))
+
+        self._w_out = np.random.randint(0, 2, size=(1 + hidden_sizes, output_size)).astype(np.float64)
+        # self.Wout = np.random.randint(0, 3, size = (1+hiddenSizes,outputSize))
+        self._old_weight_array = [self._w_out.tolist()]
+
     def predict(self, Xp):
-        hidden_predict = np.where((np.dot(Xp, self.Win[1:,:]) + self.Win[0,:]) >= 0.0, 1, -1).astype(np.float64)
-        out = np.where((np.dot(hidden_predict, self.Wout[1:,:]) + self.Wout[0,:]) >= 0.0, 1, -1).astype(np.float64)
+        hidden_predict = np.where((np.dot(Xp, self._w_in[1:, :]) + self._w_in[0, :]) >= 0.0, 1, -1).astype(np.float64)
+        out = np.where((np.dot(hidden_predict, self._w_out[1:, :]) + self._w_out[0, :]) >= 0.0, 1, -1).astype(
+            np.float64)
         return out, hidden_predict
 
-    def train(self, X, y, n_iter=5, eta = 0.01):
-        for i in range(n_iter):
-            print(self.Wout.reshape(1, -1))
+    def _search_for_repetitions(self, min_lenght):
+        local_w_out = self._w_out.tolist()
+        min_lenght -= 1
+        for i in range(min_lenght, len(self._old_weight_array) // 2):
+            if str(self._old_weight_array[-i:] + [local_w_out])[1:-1] in str(self._old_weight_array[:-i])[1:-1]:
+                for i in self._old_weight_array[-i:] + [local_w_out]:
+                    print(f"{i}")
+                return True
+        return False
+
+    def train(self, X, y, eta=0.01):
+        age = 0
+        while True:
+            print(f"Эпоха {age}")
+            print(f"Значения w_out - {self._w_out.reshape(1, -1)}")
+            errors = 0
+            np.random.shuffle(X)
             for xi, target, j in zip(X, y, range(X.shape[0])):
                 pr, hidden = self.predict(xi)
-                self.Wout[1:] += ((eta * (target - pr)) * hidden).reshape(-1, 1)
-                self.Wout[0] += eta * (target - pr)
-        return self
+                self._w_out[1:] += ((eta * (target - pr)) * hidden).reshape(-1, 1)
+                self._w_out[0] += eta * (target - pr)
+                if target != pr:
+                    errors += 1
+            print(f"Ошибок - {errors / X.shape[0] * 100}%")
 
+            if errors == 0 or self._search_for_repetitions(2):
+                return self
+            self._old_weight_array.append(self._w_out.tolist())
+            age += 1

@@ -16,7 +16,7 @@ import numpy as np
 df = pd.read_csv('data.csv')
 
 # df.to_csv('data_err.csv', index=None)
-    
+
 # смотрим что в них
 print(df.head())
 
@@ -37,23 +37,24 @@ plt.figure
 plt.scatter(X[0:50, 0], X[0:50, 1], color='red', marker='o')
 plt.scatter(X[50:100, 0], X[50:100, 1], color='blue', marker='x')
 
+
 # переходим к созданию нейрона
 # функция нейрона:
 # значение = w1*признак1+w2*признак2+w0
 # ответ = 1, если значение > 0
 # ответ = -1, если значение < 0
 
-def neuron(w,x):
-    if((w[1]*x[0]+w[2]*x[1]+w[0])>=0):
+def neuron(w, x):
+    if ((w[1] * x[0] + w[2] * x[1] + w[0]) >= 0):
         predict = 1
-    else: 
+    else:
         predict = -1
     return predict
 
+
 # проверим как это работает (веса зададим пока произвольно)
 w = np.array([0, 0.1, 0.4])
-print(neuron(w,X[1]))
-
+print(neuron(w, X[1]))
 
 # теперь создадим процедуру обучения
 # сам нейрон перепишем в виде одной строки
@@ -94,27 +95,27 @@ for xi, target, j in zip(X, y, range(X.shape[0])):
     print([w, errors, ])
 
 # попробуем визуализировать процесс обучения
-xl=np.linspace(min(X[:,0]), max(X[:,0])) # координата x
+xl = np.linspace(min(X[:, 0]), max(X[:, 0]))  # координата x
 plt.figure
-plt.scatter(X[y==1, 0], X[y==1, 1], color='red', marker='o')
-plt.scatter(X[y==-1, 0], X[y==-1, 1], color='blue', marker='x') 
+plt.scatter(X[y == 1, 0], X[y == 1, 1], color='red', marker='o')
+plt.scatter(X[y == -1, 0], X[y == -1, 1], color='blue', marker='x')
 
 w_old = None
-for i,w in zip(range(len(w_iter)), w_iter):
-    if(w!=w_old):
+for i, w in zip(range(len(w_iter)), w_iter):
+    if (w != w_old):
         w_old = w
-        yl = -(xl*w[1]+w[0])/w[2] # уравнение линии
-        plt.plot(xl, yl) # строим разделяющую границу
+        yl = -(xl * w[1] + w[0]) / w[2]  # уравнение линии
+        plt.plot(xl, yl)  # строим разделяющую границу
         plt.text(xl[-1], yl[-1], i, dict(size=10, color='gray'))
-    
-yl = -(xl*w[1]+w[0])/w[2]
+
+yl = -(xl * w[1] + w[0]) / w[2]
 plt.plot(xl, yl)
-plt.text(xl[-1]-0.3, yl[-1], 'END', dict(size=14, color='red'))
-plt.show() 
+plt.text(xl[-1] - 0.3, yl[-1], 'END', dict(size=14, color='red'))
+plt.show()
 
 # посчитаем ошибки
 predict = np.where((np.dot(X, w[1:]) + w[0]) >= 0.0, 1, -1)
-sum(predict-y)
+sum(predict - y)
 
 # теперь можем повторять процедуру обучения несколько раз, 
 # таким образом создадим эпохи обучения
@@ -133,9 +134,8 @@ for i in range(n_iter):
         errors += int((target - predict) != 0)
         print([w])
     errors_.append(errors)
-    
-    
-predict = np.where((np.dot(X, w[1:]) + w[0]) >= 0.0, 1, -1)
-sum(predict-y)
 
-# 
+predict = np.where((np.dot(X, w[1:]) + w[0]) >= 0.0, 1, -1)
+sum(predict - y)
+
+#
