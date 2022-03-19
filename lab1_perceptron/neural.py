@@ -22,20 +22,21 @@ class Perceptron:
     def _search_for_repetitions(self, min_lenght):
         local_w_out = self._w_out.tolist()
         min_lenght -= 1
-        for i in range(min_lenght, len(self._old_weight_array) // 2):
-            if str(self._old_weight_array[-i:] + [local_w_out])[1:-1] in str(self._old_weight_array[:-i-1])[1:-1]:
-                for i in self._old_weight_array[-i:] + [local_w_out]:
+        for i in range(len(self._old_weight_array) - min_lenght, len(self._old_weight_array) // 2, -1):
+            if str(self._old_weight_array[i:] + [local_w_out])[1:-1] in str(self._old_weight_array[:i])[1:-1]:
+                print("Цикл:")
+                for i in self._old_weight_array[i:] + [local_w_out]:
                     print(f"{i}")
                 return True
         return False
 
     def train(self, X, y, eta=0.01):
         age = 0
+        print(f"Стартовые значения w_out - {self._w_out.reshape(1, -1)}")
         while True:
             print(f"Эпоха {age}")
-            print(f"Значения w_out - {self._w_out.reshape(1, -1)}")
             errors = 0
-            np.random.shuffle(X)
+            # np.random.shuffle(X)
             for xi, target, j in zip(X, y, range(X.shape[0])):
                 pr, hidden = self.predict(xi)
                 self._w_out[1:] += ((eta * (target - pr)) * hidden).reshape(-1, 1)
@@ -43,7 +44,8 @@ class Perceptron:
                 if target != pr:
                     errors += 1
             print(f"Ошибок - {errors / X.shape[0] * 100}%")
-
+            print(f"Значения w_out {self._w_out.reshape(1,-1)}")
+            print(f"Конец эпохи {age}\n")
             if errors == 0 or self._search_for_repetitions(2):
                 return self
             self._old_weight_array.append(self._w_out.tolist())
