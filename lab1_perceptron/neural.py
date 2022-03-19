@@ -23,7 +23,7 @@ class Perceptron:
         local_w_out = self._w_out.tolist()
         min_lenght -= 1
         for i in range(min_lenght, len(self._old_weight_array) // 2):
-            if str(self._old_weight_array[-i:] + [local_w_out])[1:-1] in str(self._old_weight_array[:-i])[1:-1]:
+            if str(self._old_weight_array[-i:] + [local_w_out])[1:-1] in str(self._old_weight_array[:-i-1])[1:-1]:
                 for i in self._old_weight_array[-i:] + [local_w_out]:
                     print(f"{i}")
                 return True
