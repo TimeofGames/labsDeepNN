@@ -36,7 +36,7 @@ class Perceptron:
         while True:
             print(f"Эпоха {age}")
             errors = 0
-            # np.random.shuffle(X)
+            np.random.shuffle(X)
             for xi, target, j in zip(X, y, range(X.shape[0])):
                 pr, hidden = self.predict(xi)
                 self._w_out[1:] += ((eta * (target - pr)) * hidden).reshape(-1, 1)
@@ -44,7 +44,7 @@ class Perceptron:
                 if target != pr:
                     errors += 1
             print(f"Ошибок - {errors / X.shape[0] * 100}%")
-            print(f"Значения w_out {self._w_out.reshape(1,-1)}")
+            print(f"Значения w_out {self._w_out.reshape(1, -1)}")
             print(f"Конец эпохи {age}\n")
             if errors == 0 or self._search_for_repetitions(2):
                 return self
